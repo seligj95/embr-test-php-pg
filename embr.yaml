@@ -1,0 +1,7 @@
+build:
+  platform: php
+  platformVersion: "8.4"
+
+database:
+  enabled: true
+  syncCommand: php db/migrate.php

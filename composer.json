@@ -1,0 +1,7 @@
+{
+  "name": "seligj95/embr-test-php-pg",
+  "description": "Embr validation sample (throwaway): PHP + PDO + managed Postgres",
+  "require": {
+    "php": ">=8.2"
+  }
+}
