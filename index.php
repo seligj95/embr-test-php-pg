@@ -3,7 +3,25 @@ header('Content-Type: application/json');
 
 $url = getenv('DATABASE_URL');
 if (!$url) {
-    echo json_encode(['error' => 'DATABASE_URL not set']);
+    // Dump all env vars whose name hints at DB config so we can see what the runtime did inject.
+    $all = [];
+    foreach ($_ENV as $k => $v) {
+        if (preg_match('/(?:DB|DATABASE|PG|POSTGRES|EMBR)/i', $k)) {
+            $all[$k] = strlen((string)$v) > 80 ? substr((string)$v, 0, 80) . '…' : $v;
+        }
+    }
+    // Also try $_SERVER and getenv() for the well-known names directly
+    $directProbe = [];
+    foreach (['DATABASE_URL','POSTGRES_URL','PG_URL','EMBR_DATABASE_URL'] as $name) {
+        $directProbe[$name] = ['_ENV' => $_ENV[$name] ?? null, '_SERVER' => $_SERVER[$name] ?? null, 'getenv' => getenv($name) ?: null];
+    }
+    echo json_encode([
+        'error' => 'DATABASE_URL not set',
+        'dbRelatedEnv' => $all,
+        'directProbe' => $directProbe,
+        'envKeysCount' => count($_ENV),
+        'envKeysSample' => array_slice(array_keys($_ENV), 0, 20),
+    ]);
     exit;
 }
 
